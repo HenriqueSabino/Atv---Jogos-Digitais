@@ -10,7 +10,7 @@ public abstract class PooledObject : MonoBehaviour
         Listeners = new List<IPooledObjectListener>();
     }
 
-    void OnDisable()
+    protected virtual void OnDisable()
     {
         foreach (var listener in Listeners)
         {
