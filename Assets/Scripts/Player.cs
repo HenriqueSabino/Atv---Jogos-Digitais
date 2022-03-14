@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     public int health { get; private set; }
     [SerializeField]
     private int invencibilityTime;
+    public int score { get; private set; }
 
 
     [Header("Shooting")]
@@ -39,6 +40,7 @@ public class Player : MonoBehaviour
     [Header("Events")]
     public UnityEvent bulletCountChanged;
     public UnityEvent healthChanged;
+    public UnityEvent scoreChanged;
 
     [Header("Components")]
     new public Collider2D collider;
@@ -62,7 +64,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         bulletPool = new Pool(transform, bulletObject, maxBullets);
-
+        score = 0;
         gunDist = (transform.position - Gun.transform.position).magnitude / transform.localScale.x;
     }
 
@@ -205,6 +207,13 @@ public class Player : MonoBehaviour
             health = maxBullets;
 
         healthChanged.Invoke();
+    }
+
+    public void AddScore(int points)
+    {
+        score += points;
+
+        scoreChanged.Invoke();
     }
 
     void OnCollisionEnter2D(Collision2D other)

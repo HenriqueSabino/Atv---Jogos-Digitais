@@ -95,7 +95,10 @@ public class Enemy : PooledObject
             health -= Player.instance.damage;
 
             if (health <= 0)
+            {
                 gameObject.SetActive(false);
+                Player.instance.AddScore(1);
+            }
         }
     }
 

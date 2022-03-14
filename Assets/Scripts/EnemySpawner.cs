@@ -1,24 +1,18 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-
-    [SerializeField]
-    private List<EnemyStatsSO> enemyTypes;
+    public Dictionary<EnemyStatsSO, float> enemyTypes = new Dictionary<EnemyStatsSO, float>();
 
     [SerializeField]
     private GameObject enemyGO;
     private Pool enemyPool;
-
-    [SerializeField]
     public int maxEnemies;
 
-
-    [SerializeField]
-    private int spawnRate;
-
+    public int spawnRate;
 
     // Start is called before the first frame update
     void Start()
@@ -37,7 +31,17 @@ public class EnemySpawner : MonoBehaviour
             Enemy enemy = enemyGO?.GetComponent<Enemy>();
 
             if (enemy != null)
-                enemy.stats = enemyTypes[Random.Range(0, enemyTypes.Count)];
+            {
+                // Randomly selects an enemy
+                float rnd = Random.Range(0f, 1f);
+                int index = -1;
+                do
+                {
+                    rnd -= enemyTypes.Values.ElementAt(++index);
+                } while (rnd > 0);
+
+                enemy.stats = enemyTypes.Keys.ElementAt(index);
+            }
         }
     }
 }
