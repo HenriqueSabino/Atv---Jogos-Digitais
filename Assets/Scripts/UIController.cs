@@ -10,20 +10,21 @@ public class UIController : MonoBehaviour
     public TMP_Text scoreText;
     public TMP_Text waveText;
     public Slider HealthSlider;
+    public TMP_Text HealthText;
 
     private void Start()
     {
         Player.instance.bulletCountChanged.AddListener(BulletsChanged);
-        bulletsText.text = $"Bullets: {Player.instance.bullets}/{Player.instance.maxBullets}";
+        BulletsChanged();
 
         Player.instance.healthChanged.AddListener(HealthChanged);
-        HealthSlider.value = Player.instance.health / (float)Player.instance.maxHealth;
+        HealthChanged();
 
         Player.instance.scoreChanged.AddListener(ScoreChanged);
-        scoreText.text = $"Score: {Player.instance.score}";
+        ScoreChanged();
 
         GameController.instance.waveChanged.AddListener(WaveChanged);
-        waveText.text = $"Wave: {GameController.instance.currentWave}";
+        WaveChanged();
     }
 
     private void BulletsChanged()
@@ -33,6 +34,7 @@ public class UIController : MonoBehaviour
 
     private void HealthChanged()
     {
+        HealthText.text = $"{Player.instance.health}/{Player.instance.maxHealth}";
         HealthSlider.value = Player.instance.health / (float)Player.instance.maxHealth;
     }
 

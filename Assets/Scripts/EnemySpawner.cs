@@ -41,6 +41,7 @@ public class EnemySpawner : MonoBehaviour
                 } while (rnd > 0);
 
                 enemy.stats = enemyTypes.Keys.ElementAt(index);
+                enemy.ApplyStats();
             }
         }
     }

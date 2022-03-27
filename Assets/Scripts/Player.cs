@@ -71,7 +71,7 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!dead)
+        if (!dead && !GameController.instance.Paused)
         {
             horizontalVel = Input.GetAxis("Horizontal") * speed;
             animator.SetFloat("Speed", Mathf.Abs(horizontalVel));
@@ -84,7 +84,7 @@ public class Player : MonoBehaviour
 
             if (!recharging && Input.GetKeyDown(KeyCode.R))
             {
-                Recharge();
+                StartCoroutine(Recharge());
             }
 
             if (canShoot && Input.GetButton("Fire1"))
@@ -101,11 +101,11 @@ public class Player : MonoBehaviour
                     canShoot = false;
                     bullets--;
                     bulletCountChanged.Invoke();
-                    ShootCoolDown();
+                    StartCoroutine(ShootCoolDown());
                 }
                 else if (!recharging)
                 {
-                    Recharge();
+                    StartCoroutine(Recharge());
                 }
             }
         }
@@ -117,55 +117,62 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        rigidbody.velocity = new Vector2(horizontalVel, rigidbody.velocity.y);
-
-        Vector2 shootDir = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position);
-        shootDir.Normalize();
-        float angle = Mathf.Atan2(shootDir.y, shootDir.x) * Mathf.Rad2Deg;
-
-        Quaternion rotation = Quaternion.Euler(0, 0, angle);
-
-        Gun.transform.localRotation = rotation;
-        Gun.transform.localPosition = shootDir * gunDist;
-
-        if (!dead)
+        if (!GameController.instance.Paused)
         {
-            gunSpriteRenderer.flipY = angle <= -90 || angle >= 90;
-            spriteRenderer.flipX = angle <= -90 || angle >= 90;
+            rigidbody.velocity = new Vector2(horizontalVel, rigidbody.velocity.y);
 
-            if (spriteRenderer.flipX && horizontalVel > 0 || !spriteRenderer.flipX && horizontalVel < 0)
-                animator.SetBool("backwards", true);
-            else
-                animator.SetBool("backwards", false);
-        }
+            Vector2 shootDir = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position);
+            shootDir.Normalize();
+            float angle = Mathf.Atan2(shootDir.y, shootDir.x) * Mathf.Rad2Deg;
 
-        if (transform.position.y <= -5)
-        {
-            transform.position = new Vector2(8.5f, 4.5f);
-            Damage(1);
+            Quaternion rotation = Quaternion.Euler(0, 0, angle);
+
+            Gun.transform.localRotation = rotation;
+            Gun.transform.localPosition = shootDir * gunDist;
+
+            if (!dead)
+            {
+                gunSpriteRenderer.flipY = angle <= -90 || angle >= 90;
+                spriteRenderer.flipX = angle <= -90 || angle >= 90;
+
+                if (spriteRenderer.flipX && horizontalVel > 0 || !spriteRenderer.flipX && horizontalVel < 0)
+                    animator.SetBool("backwards", true);
+                else
+                    animator.SetBool("backwards", false);
+            }
+
+            if (transform.position.y <= -5)
+            {
+                transform.position = new Vector2(8.5f, 4.5f);
+                Damage(1);
+            }
         }
     }
 
-    private async void Invencible()
+    private IEnumerator Invencible()
     {
         invencible = true;
         spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0.1f);
-        await Task.Delay(invencibilityTime);
+
+        yield return new WaitForSeconds(invencibilityTime / 1000f);
+
         invencible = false;
         spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1f);
     }
 
-    private async void ShootCoolDown()
+    private IEnumerator ShootCoolDown()
     {
-        await Task.Delay(shootingInterval);
+        yield return new WaitForSeconds(shootingInterval / 1000f);
         canShoot = !recharging;
     }
 
-    private async void Recharge()
+    private IEnumerator Recharge()
     {
         recharging = true;
         canShoot = false;
-        await Task.Delay(rechargeTime);
+
+        yield return new WaitForSeconds(rechargeTime / 1000f);
+
         bulletPool.ResetPool();
 
         bullets = maxBullets;
@@ -187,7 +194,7 @@ public class Player : MonoBehaviour
             }
             else
             {
-                Invencible();
+                StartCoroutine(Invencible());
             }
 
             healthChanged.Invoke();
@@ -196,24 +203,56 @@ public class Player : MonoBehaviour
 
     public void ReloadScene()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene("GameOver");
     }
 
     public void Heal(int amount)
     {
-        health += amount;
+        if (!dead)
+        {
+            health += amount;
 
-        if (health > maxHealth)
-            health = maxBullets;
+            if (health > maxHealth)
+                health = maxHealth;
 
-        healthChanged.Invoke();
+            healthChanged.Invoke();
+        }
+    }
+
+    public void IncreaseMaxHealth(int amount)
+    {
+        if (!dead)
+        {
+            maxHealth += amount;
+
+            health = maxHealth;
+
+            healthChanged.Invoke();
+        }
+    }
+
+    public void IncreaseMaxBullets(int amount)
+    {
+        if (!dead)
+        {
+            maxBullets += amount;
+
+            bulletPool.IncreasePoolSize(amount);
+
+            bullets += amount;
+
+            bulletCountChanged.Invoke();
+        }
     }
 
     public void AddScore(int points)
     {
-        score += points;
+        if (!dead)
+        {
+            score += points;
 
-        scoreChanged.Invoke();
+            scoreChanged.Invoke();
+        }
     }
 
     void OnCollisionEnter2D(Collision2D other)

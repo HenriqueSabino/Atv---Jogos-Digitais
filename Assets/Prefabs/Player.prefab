@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 2588841399767475301}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 10.009127, y: 4.675009, z: 0}
-  m_LocalScale: {x: 6, y: 6, z: 1}
+  m_LocalScale: {x: 6, y: 6, z: 6}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7900677552957243337}
@@ -119,6 +119,9 @@ MonoBehaviour:
   healthChanged:
     m_PersistentCalls:
       m_Calls: []
+  scoreChanged:
+    m_PersistentCalls:
+      m_Calls: []
   collider: {fileID: 3034348101335772562}
   rigidbody: {fileID: 9003373371729469083}
   animator: {fileID: 972739305}
@@ -155,7 +158,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -286,7 +289,7 @@ GameObject:
   - component: {fileID: 2947997842017177335}
   - component: {fileID: 8042129454935925225}
   m_Layer: 0
-  m_Name: EnemyCollider
+  m_Name: GroundCollider
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -317,7 +320,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}

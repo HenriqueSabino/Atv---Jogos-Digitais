@@ -3,7 +3,7 @@ using UnityEngine;
 
 class Pool : IPooledObjectListener
 {
-    public int MaxSize { get; set; }
+    public int MaxSize { get; private set; }
     public GameObject PooledObject { get; set; }
     public Transform Parent;
 
@@ -62,6 +62,22 @@ class Pool : IPooledObjectListener
         for (int i = activeObjects.Count - 1; i >= 0; i--)
         {
             activeObjects[i].gameObject.SetActive(false);
+        }
+    }
+
+    public void IncreasePoolSize(int amount)
+    {
+        if (amount > 0)
+        {
+            MaxSize += amount;
+
+            for (int i = 0; i < amount; i++)
+            {
+                PooledObject obj = GameObject.Instantiate(PooledObject, Vector3.zero, Quaternion.identity, Parent.transform).GetComponent<PooledObject>();
+                obj.Listeners.Add(this);
+                activeObjects.Add(obj);
+                obj.gameObject.SetActive(false);
+            }
         }
     }
 

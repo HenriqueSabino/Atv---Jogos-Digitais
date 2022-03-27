@@ -9,25 +9,39 @@ public class GameController : MonoBehaviour
 {
     public static GameController instance;
 
-    [SerializeField]
-    private List<EnemySpawner> spawners;
-    public List<Wave> waves;
+    [Header("Enemies")]
 
     [SerializeField]
-    private int initialSpawnTimer;
+    private List<EnemySpawner> enemySpawners;
+    public List<Wave<EnemyStatsSO>> enemyWaves;
 
     [SerializeField]
-    private int minSpawnTimer;
+    private int initialEnemySpawnTimer;
+
+    [SerializeField]
+    private int minEnemySpawnTimer;
+    [SerializeField]
+    private int enemySpawntimerDecrement;
+
+    [Header("Bonus")]
+
+    [SerializeField]
+    private List<BonusSpawner> bonusSpawners;
+    public List<Wave<BonusSO>> bonusWaves;
+
+    [SerializeField]
+    private int initialBonusSpawnTimer;
+
+    [Header("General")]
 
     [SerializeField]
     private int timePerWave;
-
-    [SerializeField]
-    private int timerDecrement;
+    public bool Paused;
 
     public int currentWave { get; private set; }
 
     public UnityEvent waveChanged;
+    public UnityEvent<bool> gamePaused;
 
     private void Awake()
     {
@@ -39,52 +53,94 @@ public class GameController : MonoBehaviour
     {
         currentWave = 0;
 
-        foreach (var spawner in spawners)
+        foreach (var spawner in enemySpawners)
         {
-            spawner.spawnRate = initialSpawnTimer;
+            spawner.spawnRate = initialEnemySpawnTimer;
         }
 
-        PlayWave();
+        foreach (var spawner in bonusSpawners)
+        {
+            spawner.spawnRate = initialBonusSpawnTimer;
+        }
+
+        StartCoroutine(PlayWave());
     }
 
-    private async void PlayWave()
+    public void TogglePause()
     {
-        // Takes the last wave specified in waves that matches the current wave
-        Wave wave = waves.Last(w => w.waveNumber <= currentWave);
-
-        foreach (var spawner in spawners)
+        if (Paused)
         {
-            spawner.enemyTypes.Clear();
-            foreach (var enemy in wave.enemy)
+            Time.timeScale = 1;
+            Paused = false;
+        }
+        else
+        {
+            Time.timeScale = 0;
+            Paused = true;
+        }
+
+        gamePaused.Invoke(Paused);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePause();
+        }
+    }
+
+    private IEnumerator PlayWave()
+    {
+        while (true)
+        {
+            // Takes the last wave specified in waves that matches the current wave
+            Wave<EnemyStatsSO> enemyWave = enemyWaves.Last(w => w.waveNumber <= currentWave);
+
+            Wave<BonusSO> bonusWave = bonusWaves.Last(w => w.waveNumber <= currentWave);
+
+            foreach (var spawner in enemySpawners)
             {
-                spawner.enemyTypes.Add(enemy.enemyType, enemy.probability);
+                spawner.enemyTypes.Clear();
+                foreach (var enemy in enemyWave.objects)
+                {
+                    spawner.enemyTypes.Add(enemy.objectType, enemy.probability);
+                }
             }
+
+            foreach (var spawner in bonusSpawners)
+            {
+                spawner.bonusTypes.Clear();
+                foreach (var bonus in bonusWave.objects)
+                {
+                    spawner.bonusTypes.Add(bonus.objectType, bonus.probability);
+                }
+            }
+
+            yield return new WaitForSeconds(timePerWave / 1000f);
+
+            foreach (var spawner in enemySpawners)
+            {
+                spawner.spawnRate -= enemySpawntimerDecrement;
+            }
+
+            currentWave++;
+            waveChanged.Invoke();
         }
-
-        await Task.Delay(timePerWave);
-
-        foreach (var spawner in spawners)
-        {
-            spawner.spawnRate -= timerDecrement;
-        }
-
-        currentWave++;
-        waveChanged.Invoke();
-        PlayWave();
     }
 }
 
 [System.Serializable]
-public struct WaveEnemy
+public struct WaveObject<T>
 {
-    public EnemyStatsSO enemyType;
+    public T objectType;
     public float probability;
 }
 
 
 [System.Serializable]
-public struct Wave
+public struct Wave<T>
 {
     public int waveNumber;
-    public List<WaveEnemy> enemy;
+    public List<WaveObject<T>> objects;
 }

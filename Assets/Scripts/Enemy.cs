@@ -41,6 +41,18 @@ public class Enemy : PooledObject
         }
     }
 
+    public void ApplyStats()
+    {
+        if (stats != null)
+        {
+            speed = stats.speed;
+            jumpVel = stats.jumpVel;
+            health = stats.health;
+            damage = stats.damage;
+            animator.runtimeAnimatorController = stats.animController;
+        }
+    }
+
     private void FixedUpdate()
     {
         Vector3 dir = target.position - transform.position;

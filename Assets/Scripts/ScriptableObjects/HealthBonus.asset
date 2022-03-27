@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bbbef02b658d484188b6127c36d7bd2, type: 3}
+  m_Name: HealthBonus
+  m_EditorClassIdentifier: 
+  sprite: {fileID: 21300000, guid: ade2a24e3ba89d34d9ed37ffe72ca8da, type: 3}
+  maxHealth: 0
+  health: 2
+  maxBullets: 0
+  damage: 0

@@ -19,11 +19,22 @@ Desafio Individual Unity da disciplina de Jogos Digitais do período 2021.1 da U
    - Os inimigos se movimentam em direção ao jogador com velocidade dependente do tipo de inimigo, caso o jogador esteja acima dos inimigos e eles estiverem próximos o suficiente, os inimigos pulam em direção ao jogador.
  - Spawn
    - O spawn dos inimigos depende da onda atual do jogo, iniciando com 2 inimigo a cada 3s (1 por spawner).
- - Tipos
+ - Tipos:
    - Zombie
      - Inimigo mais lento, porém sobrevive mais aos ataques do jogador, aparece desde a primeira onda.
    - Esqueleto
      - Possue a mesma velocidade que o jogador, mas possue 1 de vida a menos que o esqueleto. Aparece após a 6 onda.
+# Upgrades
+Aparecem a cada 5 segundos nas plataformas do jogo, ficando disponíveis por apenas 3 segundos para o jogador.
+ - Tipos:
+    - Cura
+      - O upgrade de cura é o mais comum do jogo e aparece em cima das plataformas desde a primeira onda de inimigos. Ele cura dois de vida do jogado.
+    - Aumento de balas
+      - Esse upgrade aumenta a quantidade máxima de balas do jogador em 5 balas. Projéteis já gastos não são reabastecidos, mas os adicionados já ficam prontos para uso. Aparece após a onda de número 6.
+    - Aumento de vida máxima
+      - Upgrade raro que aumenta a vida máxima do jogador em 2 pontos, também curando-o, aparecendo apenas a partir da onda de número 8.
+    - Aumento de dano
+      - O mais raro dos power ups, com apenas 1% de chance na onda número 8. Aumenta o dano do jogador.
 
 # Ondas
 Cada onda dura 10s e a cada onda a dificuldade do jogo aumenta. A cada onda os inimigos surgem 100ms mais rápido que a onda anterior. Alguns inimigos só surgem a partir de certa onda e podem ficar mais frequentes com o tempo.
