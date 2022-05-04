@@ -28,23 +28,62 @@ public class Bonus : PooledObject
     {
         if (other.tag == "Player")
         {
-            if (bonusSO.health != 0)
+            if (!bonusSO.specialBonus)
             {
-                Player.instance.Heal(bonusSO.health);
-            }
+                if (bonusSO.health != 0)
+                {
+                    Player.instance.Heal(bonusSO.health);
+                }
 
-            if (bonusSO.maxHealth != 0)
-            {
-                Player.instance.IncreaseMaxHealth(bonusSO.maxHealth);
-            }
+                if (bonusSO.maxHealth != 0)
+                {
+                    Player.instance.IncreaseMaxHealth(bonusSO.maxHealth);
+                }
 
-            if (bonusSO.maxBullets != 0)
+                if (bonusSO.maxBullets != 0)
+                {
+                    Player.instance.IncreaseMaxBullets(bonusSO.maxBullets);
+                }
+
+                if (bonusSO.damage != 0)
+                {
+                    Player.instance.IncreaseDamage(bonusSO.damage);
+                }
+            }
+            else
             {
-                Player.instance.IncreaseMaxBullets(bonusSO.maxBullets);
+                switch (bonusSO.specialBonusTag)
+                {
+                    case "Freeze":
+                        FreezeEnemies();
+                        break;
+                    case "Clear":
+                        ClearEnemies();
+                        break;
+                }
             }
 
 
             gameObject.SetActive(false);
+        }
+    }
+
+    private void FreezeEnemies()
+    {
+        // Stoping enemy spawners
+        foreach (var enemySpawner in EnemySpawner.instances)
+        {
+            enemySpawner.Freeze();
+        }
+    }
+
+    private void ClearEnemies()
+    {
+        foreach (var enemy in FindObjectsOfType<Enemy>())
+        {
+            // Clearing enemies
+            enemy.gameObject.SetActive(false);
+            Player.instance.AddScore(1);
         }
     }
 

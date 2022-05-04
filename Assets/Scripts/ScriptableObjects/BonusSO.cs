@@ -9,4 +9,7 @@ public class BonusSO : ScriptableObject
     public int health;
     public int maxBullets;
     public int damage;
+
+    public bool specialBonus;
+    public string specialBonusTag;
 }

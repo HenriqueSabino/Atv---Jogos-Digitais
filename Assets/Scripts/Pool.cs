@@ -7,7 +7,7 @@ class Pool : IPooledObjectListener
     public GameObject PooledObject { get; set; }
     public Transform Parent;
 
-    private List<PooledObject> activeObjects;
+    public List<PooledObject> activeObjects { get; private set; }
     private List<PooledObject> inactiveObjects;
 
     public Pool(Transform parent, GameObject pooledObject, int maxSize)

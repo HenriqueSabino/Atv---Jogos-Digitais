@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Enemy : PooledObject
@@ -17,6 +18,7 @@ public class Enemy : PooledObject
     private int damage;
     private bool canJump;
     private Transform target;
+    private bool frozen;
 
     private void Start()
     {
@@ -41,16 +43,33 @@ public class Enemy : PooledObject
         }
     }
 
-    public void ApplyStats()
+    public void ApplyStats(int damageBonus = 1)
     {
         if (stats != null)
         {
             speed = stats.speed;
             jumpVel = stats.jumpVel;
             health = stats.health;
-            damage = stats.damage;
+            damage = stats.damage * damageBonus;
             animator.runtimeAnimatorController = stats.animController;
         }
+    }
+
+    public void ResetFreeze()
+    {
+        frozen = false;
+        StartCoroutine(ResetFreezeCoroutine());
+    }
+
+    public IEnumerator ResetFreezeCoroutine()
+    {
+        animator.SetTrigger("Unfreeze");
+
+        // Waiting for next frame
+        yield return null;
+
+        animator.ResetTrigger("Unfreeze");
+        animator.ResetTrigger("Freeze");
     }
 
     private void FixedUpdate()
@@ -59,20 +78,41 @@ public class Enemy : PooledObject
 
         float velX = 0;
 
-        if (Mathf.Abs(dir.x) > 0.1)
+        if (!frozen)
         {
-            velX = Mathf.Sign(dir.x) * speed;
+            if (Mathf.Abs(dir.x) > 0.1)
+            {
+                velX = Mathf.Sign(dir.x) * speed;
 
-            spriteRenderer.flipX = velX > 0;
-        }
+                spriteRenderer.flipX = velX > 0;
+            }
 
-        if (dir.y > 3 && Mathf.Abs(dir.x) < 3 && canJump)
-        {
-            rigidbody.velocity = new Vector2(rigidbody.velocity.x, jumpVel);
-            canJump = false;
+            if (dir.y > 3 && Mathf.Abs(dir.x) < 3 && canJump)
+            {
+                rigidbody.velocity = new Vector2(rigidbody.velocity.x, jumpVel);
+                canJump = false;
+            }
         }
 
         rigidbody.velocity = new Vector2(velX, rigidbody.velocity.y);
+    }
+
+    public void Freeze()
+    {
+        if (!frozen)
+        {
+            frozen = true;
+            animator.SetTrigger("Freeze");
+        }
+    }
+
+    public void Unfreeze()
+    {
+        if (frozen)
+        {
+            frozen = false;
+            animator.SetTrigger("Unfreeze");
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D other)

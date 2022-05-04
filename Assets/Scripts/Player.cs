@@ -245,6 +245,14 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void IncreaseDamage(int amount)
+    {
+        if (!dead)
+        {
+            damage += amount;
+        }
+    }
+
     public void AddScore(int points)
     {
         if (!dead)
